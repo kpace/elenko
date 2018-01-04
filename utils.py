@@ -41,3 +41,7 @@ def get_menu():
 def get_today_url():
     today = datetime.datetime.now().strftime('%d-%m-%Y')
     return LAVOVI_URL.format(today)
+
+
+def get_subscribers():
+    return subscriber.get_subscribers()

@@ -1,11 +1,13 @@
 import os
 import re
 import time
+import schedule
 from slackclient import SlackClient
-from command import menu, subscribe, unsubscribe
+from utils import menu, subscribe, unsubscribe, get_subscribers
 
 
 RTM_READ_DELAY = 1  # 1 second delay between reading from RTM
+SEND_MENU_TIME = '11:45'
 BOT_TOKEN = os.environ.get('ELENKO_SLACK_TOKEN', None)
 slack_client = SlackClient(BOT_TOKEN)
 
@@ -36,17 +38,28 @@ def handle_command(command, channel, user):
     if command in COMMANDS:
         response = COMMANDS[command](user)
 
+    return send_message(channel, response)
+
+
+def send_message(channel, text):
     return slack_client.api_call(
         'chat.postMessage',
         channel=channel,
-        text=response,
+        text=text,
         as_user=True
     )
+
+
+def send_daily_menu():
+    for subscriber in get_subscribers():
+        print('Sending daily menu to user: %s' % subscriber)
+        send_message(subscriber, menu())
 
 
 if __name__ == '__main__':
         if slack_client.rtm_connect(with_team_state=False):
             print('Starter Bot connected and running!')
+            schedule.every().day.at(SEND_MENU_TIME).do(send_daily_menu)
             while True:
                 try:
                     command, channel, user = read_command(
@@ -54,6 +67,8 @@ if __name__ == '__main__':
                     )
                     if command:
                         handle_command(command, channel, user)
+                    # send daily menu to subscribed users
+                    schedule.run_pending()
                 except Exception:
                     import traceback
                     traceback.print_exc()
