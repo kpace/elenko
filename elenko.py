@@ -2,7 +2,6 @@ import os
 import re
 import time
 from slackclient import SlackClient
-
 from command import menu, subscribe, unsubscribe
 
 
@@ -19,7 +18,8 @@ COMMANDS = {
 
 def read_command(slack_events):
     for event in slack_events:
-        if event["type"] == "message" and "subtype" not in event:
+        if event['type'] == 'message' and 'subtype' not in event \
+                and 'bot_id' not in event:
             print(event)
 
             # make lowercase and remove puctuation
@@ -37,15 +37,16 @@ def handle_command(command, channel, user):
         response = COMMANDS[command](user)
 
     return slack_client.api_call(
-        "chat.postMessage",
+        'chat.postMessage',
         channel=channel,
-        text=response
+        text=response,
+        as_user=True
     )
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
         if slack_client.rtm_connect(with_team_state=False):
-            print("Starter Bot connected and running!")
+            print('Starter Bot connected and running!')
             while True:
                 try:
                     command, channel, user = read_command(
@@ -58,4 +59,4 @@ if __name__ == "__main__":
                     traceback.print_exc()
                 time.sleep(RTM_READ_DELAY)
         else:
-            print("Connection failed. Exception traceback printed above.")
+            print('Connection failed. Exception traceback printed above.')

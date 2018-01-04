@@ -30,3 +30,6 @@ class Subscriber:
     def _flush(self):
         with open(self.file_name, 'wb') as file:
             pickle.dump(self.subscribers, file, pickle.HIGHEST_PROTOCOL)
+
+    def get_subscribers(self):
+        return self.subscribers
