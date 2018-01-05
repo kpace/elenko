@@ -4,4 +4,4 @@ COPY . /src
 
 RUN pip install -r /src/requirements.txt
 
-CMD ["python", "/src/elenko.py" ]
+CMD ["python", "-u", "/src/elenko.py" ]
