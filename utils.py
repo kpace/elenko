@@ -22,7 +22,7 @@ def menu(user=None):
 def subscribe(user=None):
     subscriber.subscribe(user)
     # TODO: Think for better returning of response
-    return 'Абониран сте успешно млади момко/девойко. ' +\
+    return 'Абониран сте успешно, млади момко/девойко. ' +\
         'Ще получавате менюто всеки делничен ден в 11:45.'
 
 
