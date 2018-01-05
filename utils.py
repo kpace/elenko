@@ -28,7 +28,7 @@ def subscribe(user=None):
 
 def unsubscribe(user=None):
     subscriber.unsubscribe(user)
-    return 'Абонамента е премахнат успешно.'
+    return 'Вече няма да Ви спамим.'
 
 
 def get_menu():
