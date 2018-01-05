@@ -12,9 +12,9 @@ BOT_TOKEN = os.environ.get('ELENKO_SLACK_TOKEN', None)
 slack_client = SlackClient(BOT_TOKEN)
 
 COMMANDS = {
-    'menu': menu,
-    'subscribe': subscribe,
-    'unsubscribe': unsubscribe,
+    'меню': menu,
+    'абонирай ме': subscribe,
+    'спри абонамента': unsubscribe,
 }
 
 
@@ -56,13 +56,22 @@ def send_daily_menu():
         send_message(subscriber, menu())
 
 
+def schedule_weekday(at, job):
+    """ Schedules task for every weekday at given time """
+    schedule.every().monday.at(at).do(job)
+    schedule.every().tuesday.at(at).do(job)
+    schedule.every().wednesday.at(at).do(job)
+    schedule.every().thursday.at(at).do(job)
+    schedule.every().friday.at(at).do(job)
+
+
 if __name__ == '__main__':
         if slack_client.rtm_connect(with_team_state=False):
             print('Starter Bot connected and running!')
             send_time_local = utc_to_local(SEND_TIME_UTC)
             print('Will send subscriptions in %s utc which is %s local time.'
                   % (SEND_TIME_UTC, send_time_local))
-            schedule.every().day.at(send_time_local).do(send_daily_menu)
+            schedule_weekday(send_time_local, send_daily_menu)
             while True:
                 try:
                     command, channel, user = read_command(

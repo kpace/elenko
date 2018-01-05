@@ -21,7 +21,8 @@ def menu(user=None):
 
 def subscribe(user=None):
     subscriber.subscribe(user)
-    return 'Абониран сте успешно.'
+    # TODO: Think for better returning of response
+    return 'Абониран сте успешно. Ще получавате менюто всеки ден в 11:45.'
 
 
 def unsubscribe(user=None):
