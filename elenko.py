@@ -3,11 +3,11 @@ import re
 import time
 import schedule
 from slackclient import SlackClient
-from utils import menu, subscribe, unsubscribe, get_subscribers
+from utils import menu, subscribe, unsubscribe, get_subscribers, utc_to_local
 
 
 RTM_READ_DELAY = 1  # 1 second delay between reading from RTM
-SEND_MENU_TIME = '11:45'
+SEND_TIME_UTC = '09:45'
 BOT_TOKEN = os.environ.get('ELENKO_SLACK_TOKEN', None)
 slack_client = SlackClient(BOT_TOKEN)
 
@@ -59,7 +59,10 @@ def send_daily_menu():
 if __name__ == '__main__':
         if slack_client.rtm_connect(with_team_state=False):
             print('Starter Bot connected and running!')
-            schedule.every().day.at(SEND_MENU_TIME).do(send_daily_menu)
+            send_time_local = utc_to_local(SEND_TIME_UTC)
+            print('Will send subscriptions in %s utc which is %s local time.'
+                  % (SEND_TIME_UTC, send_time_local))
+            schedule.every().day.at(send_time_local).do(send_daily_menu)
             while True:
                 try:
                     command, channel, user = read_command(

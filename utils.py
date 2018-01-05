@@ -1,4 +1,5 @@
-import datetime
+from dateutil import tz
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
@@ -39,9 +40,19 @@ def get_menu():
 
 
 def get_today_url():
-    today = datetime.datetime.now().strftime('%d-%m-%Y')
+    today = datetime.now().strftime('%d-%m-%Y')
     return LAVOVI_URL.format(today)
 
 
 def get_subscribers():
     return subscriber.get_subscribers()
+
+
+def utc_to_local(utc):
+    from_zone = tz.tzutc()
+    to_zone = tz.tzlocal()
+
+    utc_time = datetime.strptime(utc, '%H:%M')
+    utc_time = utc_time.replace(tzinfo=from_zone)
+
+    return datetime.strftime(utc_time.astimezone(to_zone), '%H:%M')
