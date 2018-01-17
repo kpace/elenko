@@ -71,6 +71,7 @@ if __name__ == '__main__':
             send_time_local = utc_to_local(SEND_TIME_UTC)
             print('Will send subscriptions in %s utc which is %s local time.'
                   % (SEND_TIME_UTC, send_time_local))
+            print('Subscribed users: %s' % str(get_subscribers()))
             schedule_weekday(send_time_local, send_daily_menu)
             while True:
                 try:

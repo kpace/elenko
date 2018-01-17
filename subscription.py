@@ -4,16 +4,18 @@ import pickle
 
 class Subscriber:
     def __init__(self):
-        self.file_name = 'subscribers.bin'
+        self.file_name = os.path.join(
+                os.environ.get('ELENKO_DATA_DIR'),
+                'subscribers.bin'
+        )
         self.load_subscribers()
 
     def load_subscribers(self):
-        if os.path.isfile(self.file_name):
+        if os.path.exists(self.file_name):
             with open(self.file_name, 'rb') as file:
                 self.subscribers = pickle.load(file)
         else:
             self.subscribers = set()
-        print(self.subscribers)
 
     def subscribe(self, user_id):
         self.subscribers.add(user_id)

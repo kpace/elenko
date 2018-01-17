@@ -4,3 +4,8 @@ services:
     build: .
     environment:
         - ELENKO_SLACK_TOKEN
+        - ELENKO_DATA_DIR
+    volumes:
+        - elenko_data:$ELENKO_DATA_DIR
+volumes:
+    elenko_data:
