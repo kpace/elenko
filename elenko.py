@@ -3,11 +3,13 @@ import re
 import time
 import schedule
 from slackclient import SlackClient
-from utils import menu, subscribe, unsubscribe, get_subscribers, utc_to_local
+from websocket import WebSocketConnectionClosedException
+from utils import menu, subscribe, unsubscribe, get_subscribers, eet_to_utc
 
 
 RTM_READ_DELAY = 1  # 1 second delay between reading from RTM
-SEND_TIME_UTC = '09:45'
+SEND_HOUR_EET = 11
+SEND_MINUTE_EET = 45
 BOT_TOKEN = os.environ.get('ELENKO_SLACK_TOKEN', None)
 slack_client = SlackClient(BOT_TOKEN)
 
@@ -68,11 +70,11 @@ def schedule_weekday(at, job):
 if __name__ == '__main__':
         if slack_client.rtm_connect(with_team_state=False):
             print('Starter Bot connected and running!')
-            send_time_local = utc_to_local(SEND_TIME_UTC)
-            print('Will send subscriptions in %s utc which is %s local time.'
-                  % (SEND_TIME_UTC, send_time_local))
+            send_time_utc = eet_to_utc(SEND_HOUR_EET, SEND_MINUTE_EET)
+            print('Will send menu in %s:%s local time, which is %s UTC.'
+                  % (SEND_HOUR_EET, SEND_MINUTE_EET, send_time_utc))
             print('Subscribed users: %s' % str(get_subscribers()))
-            schedule_weekday(send_time_local, send_daily_menu)
+            schedule_weekday(send_time_utc, send_daily_menu)
             while True:
                 try:
                     command, channel, user = read_command(
@@ -82,6 +84,9 @@ if __name__ == '__main__':
                         handle_command(command, channel, user)
                     # send daily menu to subscribed users
                     schedule.run_pending()
+                except WebSocketConnectionClosedException:
+                    print('Caught websocket disconnect, reconnecting...')
+                    slack_client.rtm_connect(with_team_state=False)
                 except Exception:
                     import traceback
                     traceback.print_exc()

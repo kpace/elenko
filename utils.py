@@ -3,6 +3,8 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
+import pytz
+
 from subscription import Subscriber
 
 
@@ -32,7 +34,9 @@ def unsubscribe(user=None):
 
 
 def get_menu():
-    response = requests.get(get_today_url())
+    today_url = get_today_url()
+    print('Today url is: %s' % today_url)
+    response = requests.get(today_url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, 'html.parser')
         menu_content = soup.find_all('p')
@@ -50,11 +54,10 @@ def get_subscribers():
     return subscriber.get_subscribers()
 
 
-def utc_to_local(utc):
-    from_zone = tz.tzutc()
-    to_zone = tz.tzlocal()
+def eet_to_utc(hour, minute):
+    eastern_tz = pytz.timezone('Europe/Sofia')
+    now = datetime.now().replace(hour=hour, minute=minute)
+    localized = eastern_tz.localize(now)
+    utc_time = localized.astimezone(pytz.utc)
 
-    utc_time = datetime.strptime(utc, '%H:%M')
-    utc_time = utc_time.replace(tzinfo=from_zone)
-
-    return datetime.strftime(utc_time.astimezone(to_zone), '%H:%M')
+    return datetime.strftime(utc_time, '%H:%M')
